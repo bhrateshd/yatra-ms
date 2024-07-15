@@ -7,14 +7,14 @@ pipeline {
     }
 
     tools {
-        maven 'Maven 3.9.8'
+        maven "Maven 3.9.8"
     }
 
     stages {
         stage('Code Compilation') {
             steps {
                 echo 'Code Compilation is In Progress!'
-                sh 'mvn clean compile'
+                sh "mvn clean compile"
                 echo 'Code Compilation is Completed Successfully!'
             }
         }
@@ -22,14 +22,14 @@ pipeline {
         stage('Code QA Execution') {
             steps {
                 echo 'JUnit Test Case Check in Progress!'
-                sh 'mvn clean test'
+                sh "mvn clean test"
                 echo 'JUnit Test Case Check Completed!'
             }
         }
         stage('Code Package') {
             steps {
                 echo 'Creating WAR Artifact'
-                sh 'mvn clean package'
+                sh "mvn clean package"
                 echo 'WAR Artifact Creation Completed'
             }
         }
