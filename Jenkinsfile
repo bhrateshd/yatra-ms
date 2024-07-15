@@ -17,7 +17,15 @@ pipeline {
                 sh "mvn clean compile"
                 echo 'Code Compilation is Completed Successfully!'
             }
-        
+        }
+
+        stage('Code QA Execution') {
+            steps {
+                echo 'JUnit Test Case Check in Progress!'
+                sh 
+                sh "mvn clean test"
+                echo 'JUnit Test Case Check Completed!'
+            }
         }
         stage('Code Package') {
             steps {
