@@ -1,5 +1,5 @@
 pipeline {
-    agent {label 'slaveA'}
+    agent any
 
 
     options {
