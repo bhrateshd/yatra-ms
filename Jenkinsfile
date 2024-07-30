@@ -19,25 +19,28 @@ pipeline {
     }
 
     stages {
-        stage('Code Compilation') {
-            steps {
-                echo 'Code Compilation is In Progress!'
-                sh 'mvn clean compile'
-                echo 'Code Compilation is Completed Successfully!'
+
+            stage('Code Compilation') {
+                steps {
+                    echo 'Code Compilation is In Progress!'
+                    sh "mvn clean compile"
+                    echo 'Code Compilation is Completed Successfully!'
+                }
             }
-        }
-        stage('Code Package') {
+
+        stage('Code QA Execution') {
+
             steps {
-                echo 'Creating WAR Artifact'
-                sh 'mvn clean package'
-                echo 'Artifact Creation Completed'
-            }
-        }
+                    echo 'JUnit Test Case Check in Progress!'
+                    sh "mvn clean test"
+                    echo 'JUnit Test Case Check Completed!'
+                    }
+                }
         stage('Building & Tag Docker Image') {
             steps {
-                echo "Starting Building Docker Image: ${env.IMAGE_NAME}"
-                sh "docker build -t ${env.IMAGE_NAME} ."
-                echo 'Docker Image Build Completed'
+                    echo "Starting Building Docker Image: ${env.IMAGE_NAME}"
+                    sh "docker build -t ${env.IMAGE_NAME} ."
+                    echo 'Docker Image Build Completed'
             }
         }
         stage('Docker Push to Docker Hub') {
