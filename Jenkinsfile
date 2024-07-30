@@ -14,7 +14,7 @@ pipeline {
     }
 
     tools {
-        maven 'maven_3.9.4'
+        maven "Maven 3.9.8"
         // sonarqubeScanner 'sonarqube-scanner'
     }
 
