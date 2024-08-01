@@ -5,7 +5,7 @@ pipeline {
         AWS_ACCOUNT_ID = "211125705951"
         REGION = "ap-south-1"
         ECR_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
-        IMAGE_NAME = "bhrateshd/demo-application:demo-application-v.1.${env.BUILD_NUMBER}"
+        IMAGE_NAME = "bhrateshd/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
         ECR_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/demo-application:demo-application-v.1.${env.BUILD_NUMBER}"
     }
 
@@ -14,33 +14,30 @@ pipeline {
     }
 
     tools {
-        maven "Maven_3.9.4"
+        maven 'maven_3.9.4'
         // sonarqubeScanner 'sonarqube-scanner'
     }
 
     stages {
-
-            stage('Code Compilation') {
-                steps {
-                    echo 'Code Compilation is In Progress!'
-                    sh "mvn clean compile"
-                    echo 'Code Compilation is Completed Successfully!'
-                }
-            }
-
-        stage('Code QA Execution') {
-
+        stage('Code Compilation') {
             steps {
-                    echo 'JUnit Test Case Check in Progress!'
-                    sh "mvn clean test"
-                    echo 'JUnit Test Case Check Completed!'
-                    }
-                }
+                echo 'Code Compilation is In Progress!'
+                sh 'mvn clean compile'
+                echo 'Code Compilation is Completed Successfully!'
+            }
+        }
+        stage('Code Package') {
+            steps {
+                echo 'Creating WAR Artifact'
+                sh 'mvn clean package'
+                echo 'Artifact Creation Completed'
+            }
+        }
         stage('Building & Tag Docker Image') {
             steps {
-                    echo "Starting Building Docker Image: ${env.IMAGE_NAME}"
-                    sh "docker build -t ${env.IMAGE_NAME} ."
-                    echo 'Docker Image Build Completed'
+                echo "Starting Building Docker Image: ${env.IMAGE_NAME}"
+                sh "docker build -t ${env.IMAGE_NAME} ."
+                echo 'Docker Image Build Completed'
             }
         }
         stage('Docker Push to Docker Hub') {
