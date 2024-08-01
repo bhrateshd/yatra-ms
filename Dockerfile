@@ -10,13 +10,13 @@ RUN update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java &
     update-alternatives --set javac /usr/lib/jvm/java-17-openjdk-amd64/bin/javac
 
 # Copy the JAR file into the Tomcat webapps directory
-COPY ./target/demo-application*.jar /usr/local/tomcat/webapps
+COPY ./target/yatra-ms*.jar /usr/local/tomcat/webapps
 
 # Expose port 8080
 EXPOSE 8080
 
 # Set the user
-USER demo-application
+USER yatra-ms
 
 # Set the working directory
 WORKDIR /usr/local/tomcat/webapps
