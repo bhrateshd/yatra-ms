@@ -8,6 +8,8 @@ pipeline {
             IMAGE_NAME = "bhrateshd/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
             ECR_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
             NEXUS_IMAGE_NAME = "3.110.50.95:8085/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
+            DOCKER_CLIENT_TIMEOUT = '300'
+            COMPOSE_HTTP_TIMEOUT = '300'
     }
 
     options {
