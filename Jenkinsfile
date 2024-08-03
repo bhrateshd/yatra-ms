@@ -45,7 +45,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_CRED', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     echo "Pushing Docker Image to DockerHub: ${env.IMAGE_NAME}"
-                    sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} --password-stdin"
+                    sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
                     sh "docker push ${env.IMAGE_NAME}"
                     echo "Docker Image Push to DockerHub Completed"
                 }
@@ -68,7 +68,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh 'docker login http://13.232.94.245:8085/repository/yatra-ms/ -u admin -p ${PASSWORD} --password-stdin'
+                        sh 'docker login http://13.232.94.245:8085/repository/yatra-ms/ -u admin -p ${PASSWORD}'
                         echo "Push Docker Image to Nexus: In Progress"
                         sh "docker tag ${env.IMAGE_NAME} ${env.NEXUS_IMAGE_NAME}"
                         sh "docker push ${env.NEXUS_IMAGE_NAME}"
