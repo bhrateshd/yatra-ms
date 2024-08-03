@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCOUNT_ID = "211125705951"
-        REGION = "ap-south-1"
-        ECR_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
-        IMAGE_NAME = "bhrateshd/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
-        ECR_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
+            AWS_ACCOUNT_ID = "211125705951"
+            REGION = "ap-south-1"
+            ECR_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
+            IMAGE_NAME = "bhrateshd/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
+            ECR_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
     }
 
     options {
@@ -61,6 +61,26 @@ pipeline {
                     sh "docker push ${env.ECR_IMAGE_NAME}"
                     echo "Docker Image Push to ECR Completed"
                 }
+            }
+        }
+        stage('Upload the Docker Image to Nexus') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh 'docker login http://13.233.104.219:8085/repository/demo-application/ -u admin -p ${PASSWORD}'
+                        echo "Push Docker Image to Nexus: In Progress"
+                        sh "docker tag ${env.IMAGE_NAME} ${env.NEXUS_IMAGE_NAME}"
+                        sh "docker push ${env.NEXUS_IMAGE_NAME}"
+                        echo "Push Docker Image to Nexus: Completed"
+                    }
+                }
+            }
+        }
+        stage('Delete Local Docker Images') {
+            steps {
+                echo "Deleting Local Docker Images: ${env.IMAGE_NAME} ${env.ECR_IMAGE_NAME} ${env.NEXUS_IMAGE_NAME}"
+                sh "docker rmi ${env.IMAGE_NAME} ${env.ECR_IMAGE_NAME} ${env.NEXUS_IMAGE_NAME}"
+                echo "Local Docker Images Deletion Completed"
             }
         }
     }
