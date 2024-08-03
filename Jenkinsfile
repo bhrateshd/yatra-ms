@@ -2,12 +2,13 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCOUNT_ID = "211125705951"
-        REGION = "ap-south-1"
-        ECR_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
-        IMAGE_NAME = "bhrateshd/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
-        ECR_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
-        NEXUS_IMAGE_NAME = "3.110.50.95:8085/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
+            AWS_ACCOUNT_ID = "211125705951"
+            REGION = "ap-south-1"
+            ECR_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
+            IMAGE_NAME = "bhrateshd/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
+            ECR_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
+            NEXUS_IMAGE_NAME = "3.110.50.95:8085/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
+
     }
 
     options {
@@ -16,6 +17,7 @@ pipeline {
 
     tools {
         maven 'Maven_3.9.4'
+        // sonarqubeScanner 'sonarqube-scanner'
     }
 
     stages {
@@ -52,7 +54,7 @@ pipeline {
         }
         stage('Docker Image Push to Amazon ECR') {
             steps {
-                echo "Tagging Docker Image for ECR: ${env.ECR_IMAGE_NAME}"
+                echo "Tagging Docker Image for ECRq: ${env.ECR_IMAGE_NAME}"
                 sh "docker tag ${env.IMAGE_NAME} ${env.ECR_IMAGE_NAME}"
                 echo "Docker Image Tagging Completed"
 
@@ -67,9 +69,8 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        echo "Logging in to Nexus"
-                        sh "docker login http://13.232.94.245:8085/repository/yatra-ms/ -u ${USERNAME} -p ${PASSWORD}"
-                        echo "Pushing Docker Image to Nexus: In Progress"
+                        sh 'docker login http://13.232.94.245:8085/repository/yatra-ms/ -u admin -p ${PASSWORD}'
+                        echo "Push Docker Image to Nexus: In Progress"
                         sh "docker tag ${env.IMAGE_NAME} ${env.NEXUS_IMAGE_NAME}"
                         sh "docker push ${env.NEXUS_IMAGE_NAME}"
                         echo "Push Docker Image to Nexus: Completed"
