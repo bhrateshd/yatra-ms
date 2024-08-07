@@ -7,7 +7,7 @@ pipeline {
             ECR_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
             IMAGE_NAME = "bhrateshd/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
             ECR_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
-            NEXUS_IMAGE_NAME = "13.233.78.166:8085/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
+            NEXUS_IMAGE_NAME = "3.110.208.166:8085/yatra-ms:yatra-ms-v.1.${env.BUILD_NUMBER}"
 
     }
 
@@ -28,6 +28,20 @@ pipeline {
                 echo 'Code Compilation is Completed Successfully!'
             }
         }
+        stage('Sonarqube Code Quality') {
+                    environment {
+                        scannerHome = tool 'sonarqube-scanner'
+                    }
+                    steps {
+                        withSonarQubeEnv('sonar-server') {
+                            sh "${scannerHome}/bin/sonar-scanner"
+                            sh 'mvn sonar:sonar'
+                        }
+                        timeout(time: 10, unit: 'MINUTES') {
+                            waitForQualityGate abortPipeline: true
+                        }
+                    }
+                }
         stage('Code Package') {
             steps {
                 echo 'Creating WAR Artifact'
@@ -69,7 +83,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh 'docker login http://13.233.78.166:8085/repository/yatra-ms/ -u admin -p ${PASSWORD}'
+                        sh 'docker login http://3.110.208.166:8085/repository/yatra-ms/ -u admin -p ${PASSWORD}'
                         echo "Push Docker Image to Nexus: In Progress"
                         sh "docker tag ${env.IMAGE_NAME} ${env.NEXUS_IMAGE_NAME}"
                         sh "docker push ${env.NEXUS_IMAGE_NAME}"
